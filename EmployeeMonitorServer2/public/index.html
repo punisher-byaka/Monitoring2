@@ -4,12 +4,65 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Employee Monitor</title>
-    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        main {
+            padding: 1rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+
+        th {
+            background-color: #4CAF50;
+            color: white;
+            text-align: left;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        tr:hover {
+            background-color: #ddd;
+        }
+
+        .screenshot {
+            max-width: 200px;
+            border: 1px solid #ddd;
+            padding: 5px;
+            background-color: white;
+        }
+    </style>
 </head>
 <body>
-    <div class="container">
+    <header>
         <h1>Connected Clients</h1>
-        <table id="clientsTable">
+    </header>
+    <main>
+        <table>
             <thead>
                 <tr>
                     <th>User</th>
@@ -18,33 +71,29 @@
                     <th>Screenshot</th>
                 </tr>
             </thead>
-            <tbody>
-                <!-- Client rows will be populated here -->
+            <tbody id="clientsTable">
             </tbody>
         </table>
-    </div>
+    </main>
     <script>
         async function fetchClients() {
             const response = await fetch('/api/clients');
             const clients = await response.json();
-            const tableBody = document.querySelector('#clientsTable tbody');
-            tableBody.innerHTML = '';
-
+            const clientsTable = document.getElementById('clientsTable');
+            clientsTable.innerHTML = '';
             clients.forEach(client => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
                         <td>${client.user}</td>
                         <td>${client.ip}</td>
-                        <td>${new Date(client.lastActive).toLocaleString()}</td>
-                        <td>
-                            ${client.screenshots.map(screenshot => `<img src="screenshots/${screenshot}" alt="screenshot" width="100">`).join('')}
-                        </td>
+                        <td>${client.lastActive}</td>
+                        <td>${client.screenshots.map(screenshot => `<img src="/screenshots/${screenshot}" alt="screenshot" class="screenshot"/>`).join('')}</td>
                     `;
-                tableBody.appendChild(row);
+                clientsTable.appendChild(row);
             });
         }
 
-        setInterval(fetchClients, 5000); // Fetch clients every 5 seconds
+        setInterval(fetchClients, 5000);
         fetchClients();
     </script>
 </body>

