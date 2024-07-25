@@ -15,7 +15,6 @@
 .vscode/
 .vs/
 Debug/
-Release/
 x64/Debug/
 
 # Игнорировать папку node_modules
