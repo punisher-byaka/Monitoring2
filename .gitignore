@@ -1,0 +1,29 @@
+# Игнорировать все временные и автоматически сгенерированные файлы
+*.obj
+*.exe
+*.ilk
+*.log
+*.pdb
+*.tlog
+*.suo
+*.ipch
+*.db
+*.db-shm
+*.db-wal
+*.opendb
+*.idb
+.vscode/
+.vs/
+Debug/
+Release/
+x64/Debug/
+x64/Release/
+
+# Игнорировать папку node_modules
+EmployeeMonitorServer2/node_modules/
+
+# Игнорировать лог файлы сервера
+EmployeeMonitorServer2/server.log
+EmployeeMonitorServer2/public/screenshots/
+
+# Дополнительно игнорировать файлы, которые могут быть специфичными для вашей среды разработки

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Monitor</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Connected Clients</h1>
+        <table id="clientsTable">
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th>IP</th>
+                    <th>Last Active</th>
+                    <th>Screenshot</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Client rows will be populated here -->
+            </tbody>
+        </table>
+    </div>
+    <script>
+        async function fetchClients() {
+            const response = await fetch('/api/clients');
+            const clients = await response.json();
+            const tableBody = document.querySelector('#clientsTable tbody');
+            tableBody.innerHTML = '';
+
+            clients.forEach(client => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                        <td>${client.user}</td>
+                        <td>${client.ip}</td>
+                        <td>${new Date(client.lastActive).toLocaleString()}</td>
+                        <td>
+                            ${client.screenshots.map(screenshot => `<img src="screenshots/${screenshot}" alt="screenshot" width="100">`).join('')}
+                        </td>
+                    `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        setInterval(fetchClients, 5000); // Fetch clients every 5 seconds
+        fetchClients();
+    </script>
+</body>
+</html>

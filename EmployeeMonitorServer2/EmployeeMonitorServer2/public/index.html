@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Monitor</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        main {
+            padding: 1rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+
+        th {
+            background-color: #4CAF50;
+            color: white;
+            text-align: left;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        tr:hover {
+            background-color: #ddd;
+        }
+
+        .screenshot {
+            max-width: 200px;
+            border: 1px solid #ddd;
+            padding: 5px;
+            background-color: white;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Connected Clients</h1>
+    </header>
+    <main>
+        <table>
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th>IP</th>
+                    <th>Last Active</th>
+                    <th>Screenshot</th>
+                </tr>
+            </thead>
+            <tbody id="clientsTable">
+            </tbody>
+        </table>
+    </main>
+    <script>
+        async function fetchClients() {
+            const response = await fetch('/api/clients');
+            const clients = await response.json();
+            const clientsTable = document.getElementById('clientsTable');
+            clientsTable.innerHTML = '';
+            clients.forEach(client => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                        <td>${client.user}</td>
+                        <td>${client.ip}</td>
+                        <td>${client.lastActive}</td>
+                        <td>${client.screenshots.map(screenshot => `<img src="/screenshots/${screenshot}" alt="screenshot" class="screenshot"/>`).join('')}</td>
+                    `;
+                clientsTable.appendChild(row);
+            });
+        }
+
+        setInterval(fetchClients, 5000);
+        fetchClients();
+    </script>
+</body>
+</html>
